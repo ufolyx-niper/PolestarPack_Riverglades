@@ -2,7 +2,7 @@
 ## Title: Polestar Community: 河林（部落）
 ## Notes: 一条连续中文路线；精英沿途注明，副本在末尾
 ## Author: Codex
-## Version: 2.0.10
+## Version: 2.0.11
 ## Dependencies: Polestar
 ## X-Polestar-Pack: riverglades-horde
 ## X-Polestar-Format: 5
