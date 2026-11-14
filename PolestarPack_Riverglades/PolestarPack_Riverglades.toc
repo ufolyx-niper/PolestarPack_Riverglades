@@ -1,8 +1,8 @@
 ## Interface: 16001
 ## Title: Polestar Community: 河林（部落）
-## Notes: 河林部落练级路线，附可选竞技场、野外精英和副本
+## Notes: 完整河林路线，精英竞技场沿途提示，附副本前置专项
 ## Author: Codex
-## Version: 2.0.15
+## Version: 2.0.16
 ## Dependencies: Polestar
 ## X-Polestar-Pack: riverglades-horde
 ## X-Polestar-Format: 5
