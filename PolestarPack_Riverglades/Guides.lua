@@ -4899,11 +4899,17 @@ local function watchOutdoorTargets()
     local C = Polestar.Compat
     local outsideRiverglades = { factions = { "Alliance" } }
     local function inRiverglades()
-        if C.IsInInstance() then return false end
-        local map = C.GetPlayerMapPosition()
-        if map then return map == 2548 end
+        local isInInstance = C.IsInInstance or IsInInstance
+        if isInInstance and isInInstance() then return false end
+        local map = C.GetPlayerMapPosition and C.GetPlayerMapPosition()
+        if map == 2548 then return true end
+        if map then
+            local info = C_Map and C_Map.GetMapInfo and C_Map.GetMapInfo(map)
+            return info ~= nil and info.parentMapID == 2548
+        end
         local zone = C.GetZoneText()
-        return zone ~= nil and (zone == C.GetMapName(2548) or zone == "河林"
+        local riverglades = C.GetMapName and C.GetMapName(2548)
+        return zone ~= nil and (zone == riverglades or zone == "河林"
             or zone == "Riverglades" or zone == "The Riverglades")
     end
     local last
