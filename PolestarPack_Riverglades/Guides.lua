@@ -4,7 +4,7 @@ local ok = Polestar.RegisterPack({
     id = "riverglades-horde",
     title = "河林（部落）",
     author = "Codex",
-    version = "2.0.18",
+    version = "2.0.19",
     format = 5,
     license = "MIT",
     source = "Adapted route facts: clearcmos/RivergladesHorde v0.3.6; local QuestieDB; player reports. See SOURCES.txt.",
@@ -4878,7 +4878,58 @@ if (GetLocale and GetLocale() or "enUS") ~= "zhCN" then
         end
     end
 end
+-- The native Along list can keep unfinished objectives after their labels.
+-- Scope the outdoor target reminders without changing their main-step copies.
+local function watchOutdoorTargets()
+    local quests = {
+        [96107] = true, [96104] = true, [93788] = true, [94680] = true,
+        [95162] = true, [94961] = true, [95288] = true, [95425] = true, [95124] = true,
+    }
+    local targets = {}
+    for _, step in ipairs(guide.steps) do
+        if step.along then
+            for _, goal in ipairs(step.goals) do
+                if goal.map == 2548 and quests[goal.quest] and (goal.t == "kill" or goal.t == "collect") then
+                    targets[#targets + 1] = { goal = goal, only = goal.only }
+                end
+            end
+        end
+    end
+
+    local C = Polestar.Compat
+    local outsideRiverglades = { factions = { "Alliance" } }
+    local function inRiverglades()
+        if C.IsInInstance() then return false end
+        local map = C.GetPlayerMapPosition()
+        if map then return map == 2548 end
+        local zone = C.GetZoneText()
+        return zone ~= nil and (zone == C.GetMapName(2548) or zone == "河林"
+            or zone == "Riverglades" or zone == "The Riverglades")
+    end
+    local last
+    local function update()
+        local show = inRiverglades()
+        if last == show then return end
+        last = show
+        for _, target in ipairs(targets) do
+            local only = outsideRiverglades
+            if show then only = target.only end
+            target.goal.only = only
+        end
+        local engine = Polestar.Engine
+        local current = engine and engine.GetGuide()
+        if current and current.id == guide.id then engine.RequestUpdate() end
+    end
+
+    update()
+    Polestar.OnLogin(update)
+    for _, event in ipairs({ "PLAYER_ENTERING_WORLD", "ZONE_CHANGED_NEW_AREA", "ZONE_CHANGED", "ZONE_CHANGED_INDOORS" }) do
+        Polestar.RegisterEvent(event, update)
+    end
+end
+
 local registered = Polestar.RegisterGuide(guide)
+if registered then watchOutdoorTargets() end
 if registered and Polestar.RetireGuides then
     Polestar.RetireGuides("riverglades-horde", {
     "riverglades-horde/continuous-v2",
